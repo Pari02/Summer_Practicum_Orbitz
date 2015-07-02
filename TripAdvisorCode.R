@@ -15,6 +15,7 @@ oldwd <- getwd()
 
 json_file <- 'C:\\Users\\Parikshita\\Desktop\\Data Science\\SummerSemester\\Practicum-CSP 572\\TripAdvisorJson\\json\\72572.json'
 json_data <- fromJSON(file=json_file)
+setwd("C:/Users/Parikshita/Desktop/Data Science/SummerSemester/Practicum-CSP 572")
 
 # getting number of rows for reviews
 len_json_data <- length(json_data[[1]])
@@ -78,14 +79,14 @@ tokenize_content[,1] <- tokenize_content[sort.list(tokenize_content[,1]),1]
 trans <- data.frame(content = as.factor(tokenize_content$Content))
 
 # Convert trans into transactions for applying apriori
-trans1 <- as(trans, "transactions")
+# trans1 <- as(trans, "transactions")
+
+# tm library has inspect() method 
+# and in order to run inspect  we need to detach tm and get arules library again
+detach(package:tm, unload=TRUE)
+library(arules)
 
 # run the rule apriori
-rules <- apriori(trans1)
+rules <- apriori(trans)
+rules <- apriori(trans, parameter=list(support=0.9, confidence=.95))
 inspect(rules)
-
-#install.packages("NLP")
-#library(NLP)
-#words(df_content[1,1])
-#tokenize_hotel[1]
-#tokenize_content[[1]][]
