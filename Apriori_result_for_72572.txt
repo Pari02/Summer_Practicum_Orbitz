@@ -1,0 +1,22 @@
+lhs              rhs           support confidence     lift
+1  {continental} => {breakfast} 0.1587983  1.0000000 1.725926
+2  {waffles}     => {breakfast} 0.1502146  1.0000000 1.725926
+3  {distance}    => {walking}   0.1931330  1.0000000 3.640625
+4  {pike}        => {market}    0.1931330  0.8823529 3.315939
+5  {friendly}    => {staff}     0.3304721  0.8651685 1.399891
+6  {breakfast,                                               
+    pike}        => {market}    0.1502146  0.9459459 3.554926
+7  {friendly,                                                
+    helpful}     => {staff}     0.1888412  0.9166667 1.483218
+8  {clean,                                                   
+    helpful}     => {staff}     0.1802575  0.8936170 1.445922
+9  {clean,                                                   
+    friendly}    => {staff}     0.1673820  0.9285714 1.502480
+10 {friendly,                                                
+    location}    => {staff}     0.1502146  0.8750000 1.415799
+11 {friendly,                                                
+    great}       => {staff}     0.1502146  0.8536585 1.381267
+12 {breakfast,                                               
+    friendly}    => {staff}     0.2188841  0.8793103 1.422773
+13 {friendly,                                                
+    room}        => {staff}     0.1630901  0.8636364 1.397412
