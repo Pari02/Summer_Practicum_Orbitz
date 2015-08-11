@@ -54,15 +54,15 @@ address <- address[-country_filter]
 
 # extracting rating & review date for all the hotels
 all_rating <- lapply(1:length(all_data), function(i) all_data[[i]]$Reviews$Ratings$Overall)
+rating_all <- all_rating[-country_filter]
 all_reviewDate <- lapply(1:length(all_data), function(i) all_data[[i]]$Reviews$Date)
+reviewDate_all <- all_reviewDate[-country_filter]
 
 # extracting bunch of hotels within a city
 for(i in 1:length(all_city)){
   
   dir.create(file.path(dirS), showWarnings = FALSE)
   city <- all_city[[i]]
-  #city <- "Indianapolis"
-
 
   # getting only those indexes which have city name in them
   city_filter <- which(sapply(lapply(1:length(address), function(x) any(which(address[[x]] %in% city))), isTRUE))  
@@ -70,10 +70,9 @@ for(i in 1:length(all_city)){
   if (length(city_filter) >= 30)
   {
     # using the index field to get rating, review date information
-    rating_city <- all_rating[city_filter]
-    reviewDate_city <- all_reviewDate[city_filter]
-    
-    
+    rating_city <- rating_all[city_filter]
+    reviewDate_city <- reviewDate_all[city_filter]
+        
     # combining city name, review date and rating
     city_rating <- lapply(1:length(city_filter), function(x) cbind(reviewDate_city[[x]], rating_city[[x]]))
     
@@ -90,10 +89,10 @@ for(i in 1:length(all_city)){
     # as.character(f) requires a "primitive lookup" to find the function as.character.factor()
     #, which is defined as as.numeric(levels(f))[f]
     city_rating$Rating <- as.numeric(levels(city_rating$Rating))[city_rating$Rating]
-    
-    
+        
     # subsetting thr data set for review dates > year 2012
     cr_2010 <- subset(city_rating, city_rating$Date >= "2010-01-01")
+    #cr_4 <- subset(cr_2010, cr_2010$Rating >= 4)
         
     avg_rating <- aggregate(cr_2010$Rating, by = list(cr_2010$City, cr_2010$Date)
                             , FUN = mean, na.rm = TRUE)
@@ -104,15 +103,19 @@ for(i in 1:length(all_city)){
     # writing the data into a csv (optional)
     #write.csv(avg_rating, paste(city , "USavg_rating.csv", sep = "_"))
     
-    file.name <- paste(city, "Smoothing.png", sep="_")
+    file.name <- paste(city, "ScatterSmooth.png", sep="_")
     savepath <- file.path(dirS, file.name)
     jpeg(savepath)
     
-    scatter.smooth(x = avg_rating$Date, y = avg_rating$AvgRating,  xlab = "Date", ylab = "Average Rating", main = "Graph for city")
+    scatter.smooth(x = avg_rating$Date, y = avg_rating$AvgRating,  xlab = "Date"
+                   , ylab = "Average Rating", main = city)
     
-    #smooth <- smooth.spline(x = as.yearmon(avg_rating$Date, "%B%d, %Y"), y = avg_rating$AvgRating, spar = .35)
-    #barplot(avg_rating$AvgRating, col = "blue", xlab = "Date"
-            , ylab = "Average Rating", main = "Graph for city")
+    #smooth <- smooth.spline(x = as.yearmon(avg_rating$Date, "%B%d, %Y")
+    #                        , y = avg_rating$AvgRating, spar = .35)
+    #x <- avg_rating$AvgRating
+    #names(x) <- avg_rating$Date
+    #plot(avg_rating$Date, avg_rating$AvgRating, col = "blue", xlab = "Date",
+    #     , ylab = "Average Rating", main = city, type = "s")
     #lines(smooth, col = "red")
     
     # to close the plot opened for each file
