@@ -13,7 +13,7 @@ library(XML)
 
 # assign path to the variables
 dirP <- file.path("C:", "Users", "Parikshita", "Desktop", "Data Science", "SummerSemester")
-dirS <- file.path(dirP, "SummerPracticum", "USCityRatingGraphs") # cityRating for csv's
+dirS <- file.path(dirP, "SummerPracticum", "USCitySmootingBar") # cityRating for csv's
 path <- file.path(dirP, "Practicum-CSP 572", "TripAdvisorJson", "json") 
 
 # creating directory where output will be saved
@@ -26,14 +26,15 @@ filename <- list.files(path, pattern = ".json", full.names = TRUE)
 all_data <- lapply(filename, function(x) fromJSON(x))
 
 # extracting cities and countries name
+all_address <- lapply(1:length(all_data), function(i) all_data[[i]]$HotelInfo$Address)
+all_doc <- lapply(1:length(all_address), function(x) htmlParse(all_address[x], asText = TRUE))
+
 all_city <- lapply(1:length(all_doc), function(x) xpathSApply(all_doc[[x]], "//span[@property='v:locality']", xmlValue))
 all_city <- unique(subset(all_city, lapply(1:length(all_city), function(x) length(all_city[[x]])) > 0))
 all_country <- lapply(1:length(all_doc), function(x) xpathSApply(all_doc[[x]], "//span[@property='v:country-name']", xmlValue))
 all_country <- unique(subset(all_country, lapply(1:length(all_country), function(x) length(all_country[[x]])) > 0))
 
 # extracting address of all the files
-all_address <- lapply(1:length(all_data), function(i) all_data[[i]]$HotelInfo$Address)
-all_doc <- lapply(1:length(all_address), function(x) htmlParse(all_address[x], asText = TRUE))
 plain.text <- lapply(1:length(all_doc), function(x) xpathSApply(all_doc[[x]], "//text()[not(ancestor::script)][not(ancestor::style)][not(ancestor::noscript)][not(ancestor::form)]", xmlValue))
 pattern <- lapply(1:length(all_doc), function(x) which(plain.text[[x]] %in% c(" ", ", ")))
 address <- lapply(1:length(plain.text), function(i) {
@@ -60,6 +61,7 @@ for(i in 1:length(all_city)){
   
   dir.create(file.path(dirS), showWarnings = FALSE)
   city <- all_city[[i]]
+  #city <- "Indianapolis"
 
 
   # getting only those indexes which have city name in them
@@ -82,25 +84,36 @@ for(i in 1:length(all_city)){
     # assigning names to columns
     colnames(city_rating) <- c("City", "Date", "Rating")
     
+    # conversting datatype of Date column to Date and Rating to numeric
+    city_rating$Date <- as.yearmon(city_rating$Date, "%B%d, %Y")
+    
+    # as.character(f) requires a "primitive lookup" to find the function as.character.factor()
+    #, which is defined as as.numeric(levels(f))[f]
+    city_rating$Rating <- as.numeric(levels(city_rating$Rating))[city_rating$Rating]
+    
+    
     # subsetting thr data set for review dates > year 2012
-    cr_2012 <- subset(city_rating, as.yearmon(city_rating[,"Date"], "%B%d, %Y") >= "Jan 2010")
-    
-    # getting average rating for the city by month
-    avg_rating <- aggregate(as.numeric(cr_2012[,"Rating"])
-                            , by = list(cr_2012[,"City"], as.yearmon(cr_2012[,"Date"], "%B%d, %Y"))
+    cr_2010 <- subset(city_rating, city_rating$Date >= "2010-01-01")
+        
+    avg_rating <- aggregate(cr_2010$Rating, by = list(cr_2010$City, cr_2010$Date)
                             , FUN = mean, na.rm = TRUE)
-    
+
     # assigning names to columns
     colnames(avg_rating) <- c("City", "Date", "AvgRating")
     
     # writing the data into a csv (optional)
-    #write.csv(avg_rating, paste(city , "avg_rating.csv", sep = "_"))
+    #write.csv(avg_rating, paste(city , "USavg_rating.csv", sep = "_"))
     
-    file.name <- paste(city, "curveGraph.png", sep="_")
+    file.name <- paste(city, "Smoothing.png", sep="_")
     savepath <- file.path(dirS, file.name)
     jpeg(savepath)
     
-    plot(avg_rating$Date, avg_rating$AvgRating, type = "l", xlab = "Date", ylab = city)
+    #scatter.smooth(x = avg_rating$Date, y = avg_rating$AvgRating,  xlab = "Date", ylab = "Average Rating", main = "Graph for city")
+    
+    smooth <- smooth.spline(x = as.yearmon(avg_rating$Date, "%B%d, %Y"), y = avg_rating$AvgRating, spar = .35)
+    barplot(avg_rating$AvgRating, col = "blue", xlab = "Date"
+            , ylab = "Average Rating", main = "Graph for city")
+    lines(smooth, col = "red")
     
     # to close the plot opened for each file
     dev.off()
