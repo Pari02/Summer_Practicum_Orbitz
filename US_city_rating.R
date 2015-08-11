@@ -13,7 +13,7 @@ library(XML)
 
 # assign path to the variables
 dirP <- file.path("C:", "Users", "Parikshita", "Desktop", "Data Science", "SummerSemester")
-dirS <- file.path(dirP, "SummerPracticum", "USCitySmootingBar") # cityRating for csv's
+dirS <- file.path(dirP, "SummerPracticum", "USCityScatterSmooth") # cityRating for csv's
 path <- file.path(dirP, "Practicum-CSP 572", "TripAdvisorJson", "json") 
 
 # creating directory where output will be saved
@@ -108,12 +108,12 @@ for(i in 1:length(all_city)){
     savepath <- file.path(dirS, file.name)
     jpeg(savepath)
     
-    #scatter.smooth(x = avg_rating$Date, y = avg_rating$AvgRating,  xlab = "Date", ylab = "Average Rating", main = "Graph for city")
+    scatter.smooth(x = avg_rating$Date, y = avg_rating$AvgRating,  xlab = "Date", ylab = "Average Rating", main = "Graph for city")
     
-    smooth <- smooth.spline(x = as.yearmon(avg_rating$Date, "%B%d, %Y"), y = avg_rating$AvgRating, spar = .35)
-    barplot(avg_rating$AvgRating, col = "blue", xlab = "Date"
+    #smooth <- smooth.spline(x = as.yearmon(avg_rating$Date, "%B%d, %Y"), y = avg_rating$AvgRating, spar = .35)
+    #barplot(avg_rating$AvgRating, col = "blue", xlab = "Date"
             , ylab = "Average Rating", main = "Graph for city")
-    lines(smooth, col = "red")
+    #lines(smooth, col = "red")
     
     # to close the plot opened for each file
     dev.off()
