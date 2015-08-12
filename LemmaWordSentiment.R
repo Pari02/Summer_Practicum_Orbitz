@@ -7,9 +7,9 @@ colfunc<-colorRamp(c("red", "green"))
 
 # assign path to the variables
 dirP <- file.path("C:", "Users", "Parikshita", "Desktop", "Data Science", "SummerSemester"
-                  , "SummerPracticum", "Old Feature & Fequency")
-dirS <- file.path(dirP, "WordCloud")
-path <- file.path(dirP, "Feature Results") 
+                  , "SummerPracticum", "Lemma Input & Output")
+dirS <- file.path(dirP, "Ins_City_WordCloud")
+path <- file.path(dirP, "Feature Results-International_Cities") 
 
 # extracting name of all the files that will be used to create wordcloud
 file.names <- dir(path, pattern = ".csv")
