@@ -9,7 +9,7 @@ library(RColorBrewer)
 dirP <- file.path("C:", "Users", "Parikshita", "Desktop", "Data Science", "Summer 2015"
                   , "SummerPracticum", "Orbitz")
 #dirS <- file.path(dirP, "Ins_City_WordCloud")
-path <- file.path(dirP, "baltimore") 
+path <- file.path(dirP, "seattle") 
 
 # extracting name of all the files that will be used to create wordcloud
 file.names <- dir(path, pattern = ".csv")
